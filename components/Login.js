@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, ScrollView, Button } from 'react-native';
-
+import ORDivider from './ORDivider';
 import BasicButton from "./BasicButton";
 import LoginSignupBtn from "./LoginSignupBtn";
 import Signup from "./Signup";
 
-export default function Login() {
+export default function Login({navigation}) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
     // Function singup button handling
     function handleSignUpBtnClick() {
+        navigation.navigate("SignUp")
         console.log("SignUp Clicked")
     }
     // Function onClick
@@ -42,6 +43,9 @@ export default function Login() {
                     value={password}
                     onChangeText={(val) => setPassword(val)}
                 />
+
+                <ORDivider/>
+
                 <BasicButton text="Login" onPress={handleLoginonClick} />
                 <View style={styles.divider}></View>
                 <LoginSignupBtn

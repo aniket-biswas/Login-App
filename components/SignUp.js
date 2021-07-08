@@ -4,6 +4,9 @@ import BasicButton from './BasicButton';
 import LoginSignUpBtn from './LoginSignUpBtn';
 import { Picker } from '@react-native-picker/picker';
 import ValidationComponent from 'react-native-form-validator';
+import ORDivider from './ORDivider';
+import SnackBar from './SnackBar';
+import {Audio} from 'expo-av';
 
 export default class SignUp extends ValidationComponent {
 	constructor(props) {
@@ -14,12 +17,27 @@ export default class SignUp extends ValidationComponent {
 			ageGroup: '',
 			password: '',
 			confirmPassword: '',
+			snackbarVisible:false,
+			snackbarText:"",
+			snackbarType:"",
 		};
 	}
 
+	playAudio = async () => {
+		try {
+			const soundObject = new Audio.Sound();
+			await soundObject.loadAsync(require('../assets/ding2.mp3'));
+			await soundObject.playAsync();
+	
+		   
+		} catch (error) {
+			console.log(error)
+		}
+	}
 	//function to handle when signup btn is clicked on
 	handleRegisterBtnClick = () => {
 		//validating fields using 3rd party library
+		console.log("Clicked")
 		this.validate({
 			name: { minlength: 3, maxlength: 25, required: true },
 			email: { email: true, required: true },
@@ -27,16 +45,40 @@ export default class SignUp extends ValidationComponent {
 			password: { required: true },
 			confirmPassword: { equalPassword: this.state.password, required: true },
 		});
+		if (this.getErrorMessages()){
+			console.log("GIYSADGFUFDSDF")
+			this.displaySnackBar("error",this.getErrorMessages())
+		}
+		else{
+			this.hideSnackBar()
+			this.playAudio();
+			this.displaySnackBar("success","Registered Successfully")
+		}
 	};
 
+	displaySnackBar = (type,text)=>{
+		this.setState({
+		snackbarVisible:true,
+		snackbarText:text,
+		snackbarType:type,
+		})
+	}
+	hideSnackBar = ()=>{
+		this.setState({
+		snackbarVisible:false,
+		})
+	}
 	//function to handle when sign in btn is clicked on
-	handleSignInBtnClick() {
+	handleSignInBtnClick=()=> {
+		this.props.navigation.navigate("Login")
 		console.log('sign in clicked');
 	}
 
+	
 	//component rendering
 	render() {
 		return (
+			<>
 			<ScrollView style={styles.container}>
 				<Text style={styles.title}>Sign Up</Text>
 
@@ -99,8 +141,8 @@ export default class SignUp extends ValidationComponent {
 
 				<BasicButton text="Register" onPress={this.handleRegisterBtnClick} />
 
-				<Text style={styles.log}>{this.getErrorMessages()}</Text>
-
+				{/* <Text style={styles.log}>{this.getErrorMessages()}</Text> */}
+				<ORDivider/>
 				<LoginSignUpBtn
 					customStyle={styles.signin}
 					text="Already have an account?"
@@ -108,6 +150,16 @@ export default class SignUp extends ValidationComponent {
 					onPress={this.handleSignInBtnClick}
 				/>
 			</ScrollView>
+			{
+				this.state.snackbarVisible?
+				<SnackBar
+				isVisible={this.state.snackbarVisible}
+                text={this.state.snackbarText}
+                type={this.state.snackbarType}
+                onClose={this.hideSnackBar}
+				/>:null
+			}
+			</>
 		);
 	}
 }
@@ -121,11 +173,25 @@ const styles = StyleSheet.create({
 	},
 
 	title: {
-		fontWeight: '800',
+		// fontWeight: '800',
+		// fontSize: 40,
+		// letterSpacing: 0.1,
+		// color: '#114E60',
+		// fontFamily: "Consolas",
+		backgroundColor: '#B5EAEA',
+        padding: 10,
+        width: 160,
+        marginTop: 10,
+        shadowColor: '#47597E',
+        shadowOffset: { height: 8, width: 8 },
+        shadowOpacity: 2,
+        shadowRadius: 10,    
+		// 4
+        borderRadius: 15,
 		fontSize: 40,
-		letterSpacing: 0.1,
-		color: '#114E60',
-		fontFamily: "Consolas",
+		color: '#52006A',
+		fontFamily:"Helvatica",
+		fontWeight: '800'
 	},
 
 	form: {
@@ -163,6 +229,6 @@ const styles = StyleSheet.create({
 	},
 
 	signin: {
-		marginVertical: 40,
+		marginVertical: 10,
 	},
 });
